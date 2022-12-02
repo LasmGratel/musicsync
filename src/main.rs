@@ -20,11 +20,11 @@ fn main() {
         .args([
             arg!(<INPUT> "Input directory for walking"),
             arg!(<OUTPUT> "Output directory"),
-            arg!([EXTENSION] "Output file extension, default to opus"),
+            arg!([EXTENSION] "Output file extension, default to ogg"),
             arg!(-f --force "Force overwrite existing files"),
             arg!(--preserve "Preserve target folder files, even if they don't exist in source dir"),
             arg!(--dontcopycover "Don't copy cover images"),
-            arg!(-o --options <OPTIONS> "Options to be passed to ffmpeg, default to -c:a libopus -b:a 192K -vbr on -cutoff 0"),
+            arg!(-o --options <OPTIONS> "Options to be passed to ffmpeg, default to -c:a libopus -b:a 192K -vbr on -cutoff 0 -c:v copy"),
             arg!(-t --filetype <TYPES> "Specify file types to be converted, split with a ',' character. Default to mp3,aac,aif,flac,ogg,wav"),
             arg!(--cover <COVER> "Cover image suffix (case-insensitive). Default to Cover.jpg,Cover.png,AlbumArtSmall.jpg,AlbumArtwork.png")
         ]);
@@ -38,7 +38,7 @@ fn main() {
         matches.get_flag("force"),
         matches.get_flag("preserve"),
         matches.get_flag("dontcopycover"),
-        matches.get_one::<String>("OPTIONS").cloned().unwrap_or_else(|| "-c:a libopus -b:a 192K -vbr on -cutoff 0".to_string()),
+        matches.get_one::<String>("OPTIONS").cloned().unwrap_or_else(|| "-c:a libopus -b:a 192K -vbr on -cutoff 0 -c:v copy".to_string()),
         matches.get_one::<String>("TYPES")
             .map(|x| x.split(',').map(|x| x.to_string()).collect())
             .unwrap_or_default(),
