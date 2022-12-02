@@ -2,6 +2,13 @@
 name = "musicsync"
 version = "0.1.0"
 edition = "2021"
+authors = ["Lasm Gratel"]
+homepage = "https://github.com/LasmGratel/musicsync"
+repository = "https://github.com/LasmGratel/musicsync"
+description = "Convert your music folder into another format, for portable purpose."
+documentation = "https://docs.rs/musicsync"
+readme = "README.md"
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
