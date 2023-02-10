@@ -1,22 +1,22 @@
 [package]
-name = "musicsync"
-version = "0.1.0"
-edition = "2021"
 authors = ["Lasm Gratel"]
-homepage = "https://github.com/LasmGratel/musicsync"
-repository = "https://github.com/LasmGratel/musicsync"
-description = "Convert your music folder into another format, for portable purpose."
-documentation = "https://docs.rs/musicsync"
-readme = "README.md"
+description = "Convert your music folder into video."
+documentation = "https://docs.rs/songstovideo"
+edition = "2021"
+homepage = "https://github.com/LasmGratel/songstovideo"
 license = "MIT"
+name = "songstovideo"
+readme = "README.md"
+repository = "https://github.com/LasmGratel/songstovideo"
+version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4", features = ["cargo"] }
+clap = {version = "4", features = ["cargo"]}
 
-indicatif = "0.17"
-walkdir = "2"
-rayon = "1"
 crossbeam = "0.8"
+indicatif = "0.17"
+rayon = "1"
 thiserror = "1"
+walkdir = "2"
