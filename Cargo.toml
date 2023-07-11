@@ -1,13 +1,13 @@
 [package]
 authors = ["Lasm Gratel"]
-description = "Convert your music folder into video."
-documentation = "https://docs.rs/songstovideo"
+description = "Convert your music folder into another format, for portable purpose."
+documentation = "https://docs.rs/musicsync"
 edition = "2021"
-homepage = "https://github.com/LasmGratel/songstovideo"
+homepage = "https://github.com/LasmGratel/musicsync"
 license = "MIT"
-name = "songstovideo"
+name = "musicsync"
 readme = "README.md"
-repository = "https://github.com/LasmGratel/songstovideo"
+repository = "https://github.com/LasmGratel/musicsync.git"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
