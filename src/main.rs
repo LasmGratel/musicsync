@@ -129,14 +129,15 @@ fn walk<P: AsRef<Path>>(input_path: P, output_path: P,
             });
     }
 
-    let progress = ProgressBar::new(input_files.len() as u64);
+    let diff: HashSet<_> = input_files.difference(&output_files).collect();
+    let progress = ProgressBar::new(diff.len() as u64);
     progress.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({eta})")
         .unwrap()
         .with_key("eta", |state: &ProgressState, w: &mut dyn Write| write!(w, "{:.1}s", state.eta().as_secs_f64()).unwrap())
         .progress_chars("#>-"));
 
-    input_files.difference(&output_files)
-        .par_bridge()
+
+    diff.into_par_iter()
         .for_each(|input| {
             let output = output_path.join(input.clone().with_extension(&extension));
             let input = input_path.join(input);
@@ -151,6 +152,8 @@ fn walk<P: AsRef<Path>>(input_path: P, output_path: P,
             }
             if input.exists() {
                 convert(input, output, &options);
+            } else {
+                panic!("Input file {:?} does not exist", input);
             }
             progress.inc(1);
         });
