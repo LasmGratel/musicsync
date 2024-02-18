@@ -24,7 +24,8 @@ fn main() {
             arg!(-f --force "Force overwrite existing files"),
             arg!(--preserve "Preserve target folder files, even if they don't exist in source dir"),
             arg!(--dontcopycover "Don't copy cover images"),
-            arg!(-o --options <OPTIONS> "Options to be passed to ffmpeg, default to -c:a libopus -b:a 192K -vbr on -cutoff 0 -c:v copy"),
+            arg!(-p --preset <PRESET> "Default to opus, valid presets: opus, ogg, mp3, aac."),
+            arg!(-o --options <OPTIONS> "Options to be passed to ffmpeg, will override preset"),
             arg!(-t --filetype <TYPES> "Specify file types to be converted, split with a ',' character. Default to mp3,aac,aif,flac,ogg,wav"),
             arg!(--cover <COVER> "Cover image suffix (case-insensitive). Default to Cover.jpg,Cover.png,AlbumArtSmall.jpg,AlbumArtwork.png")
         ]);
@@ -34,18 +35,39 @@ fn main() {
     walk(
         matches.get_one::<String>("INPUT").expect("No input directory specified!"),
         matches.get_one::<String>("OUTPUT").expect("No output directory specified!"),
-        matches.get_one::<String>("EXTENSION").cloned().unwrap_or_else(|| "opus".to_string()),
+        matches.get_one::<String>("EXTENSION").or(matches.get_one::<String>("preset")).cloned().unwrap_or_else(|| "opus".to_string()),
         matches.get_flag("force"),
-        matches.get_flag("preserve"),
+        //matches.get_flag("preserve"),
+        true,
         matches.get_flag("dontcopycover"),
-        matches.get_one::<String>("OPTIONS").cloned().unwrap_or_else(|| "-c:a libopus -b:a 192K -vbr on -cutoff 0 -c:v copy".to_string()),
-        matches.get_one::<String>("TYPES")
+        matches.get_one::<String>("options")
+            .cloned()
+            .unwrap_or_else(|| get_preset(matches.get_one::<String>("EXTENSION").or(matches.get_one::<String>("preset")).map(|x| x.as_str()).unwrap_or_else(|| "opus")).to_string()),
+        matches.get_one::<String>("filetype")
             .map(|x| x.split(',').map(|x| x.to_string()).collect())
             .unwrap_or_default(),
-        matches.get_one::<String>("COVER")
+        matches.get_one::<String>("cover")
             .map(|x| x.split(',').map(|x| x.to_string()).collect())
             .unwrap_or_default(),
     );
+}
+
+// Helper function to match presets
+fn get_preset(name: &str) -> &str {
+    match name.trim() {
+        "ogg" => {
+            "-c:a libvorbis -b:a 128K -vbr on -cutoff 0 -c:v copy"
+        }
+        "aac" => {
+            "-c:a aac -b:a 128K -vbr on -cutoff 0 -c:v copy"
+        }
+        "mp3" => {
+            "-c:a libmp3lame -b:a 320K -vbr on -cutoff 0 -c:v copy"
+        }
+        _ => {
+            "-c:a libopus -b:a 128K -vbr on -cutoff 0 -c:v copy"
+        }
+    }
 }
 
 fn walk<P: AsRef<Path>>(input_path: P, output_path: P,
@@ -129,7 +151,9 @@ fn walk<P: AsRef<Path>>(input_path: P, output_path: P,
             });
     }
 
-    let diff: HashSet<_> = input_files.difference(&output_files).collect();
+    let diff: HashSet<_> = input_files.difference(&output_files).filter(|x| {
+        !output_path.join(x.with_extension(&extension)).exists() || overwrite
+    }).collect();
     let progress = ProgressBar::new(diff.len() as u64);
     progress.set_style(ProgressStyle::with_template("{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {pos}/{len} ({eta})")
         .unwrap()
